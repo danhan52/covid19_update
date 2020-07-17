@@ -1,0 +1,54 @@
+---
+title: "COVID-19 by location"
+author: "Danny Hanson"
+date: "7/11/2020"
+output:
+  html_document:
+    toc: false
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 10,
+  fig.height = 6
+)
+options(scipen = 100)
+```
+
+```{r load_data}
+library(plotly)
+library(tidyverse)
+library(kableExtra)
+
+load('data/covid_ts.RData')
+load('data/covid_today.RData')
+```
+
+
+## Bar Charts {.tabset .tabset-fade .tabset-pills}
+### All Countries
+```{r world_bar, fig.width=6, fig.height=10}
+p <-
+  today_global %>%
+  mutate(rnk = row_number(desc(new_cases))) %>%
+  filter(rnk < 30) %>%
+  ggplot(aes(x = reorder(country, new_cases), y = new_cases)) +
+  geom_bar(stat = 'identity') +
+  coord_flip()
+ggplotly(p)
+```
+
+### US States
+```{r state_bar}
+
+```
+
+### US Counties
+```{r county_bar}
+
+```
+

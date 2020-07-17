@@ -1,0 +1,30 @@
+---
+title: 'Home'
+output:
+  html_document:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+load('data/covid_today.RData')
+```
+
+Use the tabs above to see the data on different scales.
+
+## The Data
+US data goes through `r max(today_states$date)`  
+Global data goes through `r max(today_global$date)`
+
+All global COVID-19 data comes from the [John's Hopkins CSSE repository](https://github.com/CSSEGISandData/COVID-19/). All US COVID-19 data comes from the [New York Times repository](https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv).
+
+The population data was pulled from the following sources:
+
+- [United State Census](https://www.census.gov/data/datasets/time-series/demo/popest/2010s-counties-total.html)
+- [World Population](https://worldpopulationreview.com/)
+
+The geojson shape files come from the following sources:
+
+- [US Counties](https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json)
+- [US States](https://raw.githubusercontent.com/rstudio/leaflet/gh-pages/json/us-states.geojson)
+- [Countries](https://raw.githubusercontent.com/AshKyd/geojson-regions/master/countries/110m/all.geojson)
+

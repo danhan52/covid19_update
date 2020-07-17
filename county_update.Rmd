@@ -1,0 +1,73 @@
+---
+title: 'County Update'
+output:
+  html_document:
+    toc: false
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 10,
+  fig.height = 6
+)
+options(scipen = 100)
+```
+
+```{r load_data}
+library(plotly)
+library(tidyverse)
+library(kableExtra)
+library(DT)
+
+load('data/covid_today.RData')
+load('data/geojson.RData')
+```
+
+## Map of New Cases
+```{r county_map_cases}
+fig <-
+  today_counties %>%
+  mutate(cty_name = paste(county, 'County -', state)) %>%
+  plot_ly(data = .) %>%
+  add_trace(
+    type="choroplethmapbox",
+    geojson=geo_counties,
+    locations=~fips,
+    z=~new_cases,
+    colorscale="Viridis",
+    text=~cty_name,
+    hoverinfo='z+text',
+    marker=list(line=list(
+      width=0),
+      opacity=0.5
+    )
+  ) %>%
+  layout(
+    mapbox=list(
+      style="carto-positron",
+      zoom =2,
+      center=list(lon= -95.71, lat=37.09))
+  )
+fig
+```
+
+## Table of New Cases
+```{r county_table_cases}
+ today_counties %>%
+  select(State = state, County = county, Date = date, 'New Cases' = new_cases,
+         'New Deaths' = new_deaths) %>%
+  arrange(desc(`New Cases`)) %>%
+  datatable(options = list(pageLength = 20)) %>%
+  formatStyle(
+    'New Cases',
+    background = styleColorBar(today_counties$new_cases, 'steelblue')
+  ) %>%
+  formatStyle(
+    'New Deaths',
+    background = styleColorBar(today_counties$new_deaths, 'steelblue')
+  )
+```

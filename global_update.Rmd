@@ -1,0 +1,68 @@
+---
+title: 'Global Update'
+output:
+  html_document:
+    toc: false
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 10,
+  fig.height = 6
+)
+options(scipen = 100)
+```
+
+```{r load_data}
+library(plotly)
+library(tidyverse)
+library(kableExtra)
+library(DT)
+
+load('data/covid_today.RData')
+load('data/geojson.RData')
+```
+
+## Map of New Cases
+```{r world_map_cases}
+fig <-
+  plot_ly(data = today_global) %>%
+  add_trace(
+    type="choroplethmapbox",
+    geojson=geo_countries,
+    locations=~country,
+    z=~new_cases,
+    colorscale="Viridis",
+    marker=list(line=list(
+      width=0),
+      opacity=0.5
+    )
+  ) %>%
+  layout(
+    mapbox=list(
+      style="carto-positron"
+    )
+  )
+fig
+```
+
+## Table of New Cases
+```{r world_table_cases}
+ today_global %>%
+  select(Country = country, Date = date, 'New Cases' = new_cases,
+         'New Deaths' = new_deaths) %>%
+  arrange(desc(`New Cases`)) %>%
+  datatable(options = list(pageLength = 20)) %>%
+  formatStyle(
+    'New Cases',
+    background = styleColorBar(today_global$new_cases, 'steelblue')
+  ) %>%
+  formatStyle(
+    'New Deaths',
+    background = styleColorBar(today_global$new_deaths, 'steelblue')
+  )
+```

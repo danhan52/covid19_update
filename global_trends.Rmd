@@ -1,0 +1,119 @@
+---
+title: 'Global Trends'
+output:
+  html_document:
+    toc: false
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 10,
+  fig.height = 6
+)
+options(scipen = 100)
+```
+
+```{r load_data}
+library(plotly)
+library(tidyverse)
+library(kableExtra)
+
+load('data/covid_ts.RData')
+load('data/covid_today.RData')
+load('data/geojson.RData')
+
+c2c_map <-
+  geo_countries$features %>%
+  map_df(function(x) {
+    tibble(country = x$properties$admin, continent = x$properties$continent)
+  })
+
+covid_global <-
+  covid_global %>%
+  left_join(c2c_map, by = 'country') %>%
+  group_by(continent, country) %>%
+  mutate(mx_tot = max(cases)) %>%
+  group_by(continent) %>%
+  mutate(rnk = dense_rank(desc(mx_tot))) %>%
+  ungroup()
+```
+
+
+## Daily New Cases {.tabset .tabset-fade .tabset-pills}
+Only the top 5 countries (by total number of cases) are shown.
+
+### North America
+```{r north_america_trend_case}
+p <-
+  covid_global %>%
+  filter(continent %in% 'North America', rnk <= 5) %>%
+  ggplot(aes(x = date, y = new_cases, color = country)) +
+  geom_point() +
+  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
+
+ggplotly(p)
+```
+
+### South America
+```{r south_america_trend_case}
+p <-
+  covid_global %>%
+  filter(continent %in% 'South America', rnk <= 5) %>%
+  ggplot(aes(x = date, y = new_cases, color = country)) +
+  geom_point() +
+  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
+
+ggplotly(p)
+```
+
+### Europe
+```{r europe_trend_case}
+p <-
+  covid_global %>%
+  filter(continent %in% 'Europe', rnk <= 5) %>%
+  ggplot(aes(x = date, y = new_cases, color = country)) +
+  geom_point() +
+  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
+
+ggplotly(p)
+```
+
+### Africa
+```{r africa_trend_case}
+p <-
+  covid_global %>%
+  filter(continent %in% 'Africa', rnk <= 5) %>%
+  ggplot(aes(x = date, y = new_cases, color = country)) +
+  geom_point() +
+  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
+
+ggplotly(p)
+```
+
+### Asia
+```{r asia_trend_case}
+p <-
+  covid_global %>%
+  filter(continent %in% 'Asia', rnk <= 5) %>%
+  ggplot(aes(x = date, y = new_cases, color = country)) +
+  geom_point() +
+  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
+
+ggplotly(p)
+```
+
+### Oceania
+```{r oceania_trend_case}
+p <-
+  covid_global %>%
+  filter(continent %in% 'Oceania', rnk <= 5) %>%
+  ggplot(aes(x = date, y = new_cases, color = country)) +
+  geom_point() +
+  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
+
+ggplotly(p)
+```
