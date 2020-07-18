@@ -1,0 +1,24 @@
+name: Render website
+on:
+  push:
+    paths:
+      - README.Rmd
+
+
+jobs:
+  render:
+    name: Render website
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-pandoc@v1
+      - name: Install libraries
+        run: Rscript -e 'install.packages(c("tidyverse", "rvest", "rmarkdown", "plotly", "DT", "knitr"))'
+      - name: Repull data
+        run: Rscript render_site.R
+      - name: Commit results
+        run: |
+          git add docs/*
+          git commit -m 'Update site with new data' || echo "No changes to commit"
+          git push origin master || echo "No changes to commit"
