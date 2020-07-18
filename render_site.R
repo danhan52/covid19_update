@@ -1,4 +1,4 @@
-setwd('C:/Users/danny/repos/covid19_update/')
+# setwd('C:/Users/danny/repos/covid19_update/')
 
 source('load_data.R')
 dir.create('data')
