@@ -2,7 +2,7 @@ name: Render website
 on:
   push:
     paths:
-      - README.Rmd
+      - README.md
 
 
 jobs:
