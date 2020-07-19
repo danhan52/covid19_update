@@ -16,6 +16,6 @@ save(
 )
 
 # rmarkdown::clean_site()
-file.remove(file.path('docs', dir('docs')))
-file.remove('docs')
+# file.remove(file.path('docs', dir('docs')))
+# file.remove('docs')
 rmarkdown::render_site()
