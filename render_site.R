@@ -7,7 +7,7 @@ save(
   file = 'data/covid_ts.RData'
 )
 save(
-  today_global, today_global_m5, today_states, today_counties,
+  today_global, today_states, today_counties,
   file = 'data/covid_today.RData'
 )
 save(
