@@ -21,7 +21,8 @@ covid_us <-
     new_cases = cases - lag(cases, default = 0, order_by = date),
     new_deaths = deaths - lag(deaths, default = 0, order_by = date)
   ) %>%
-  ungroup()
+  ungroup() %>%
+  filter(new_cases > -100, new_deaths > -100)
 
 geo_counties <-
   rjson::fromJSON(file = paste0('https://raw.githubusercontent.com/plotly/',
@@ -76,12 +77,9 @@ covid_global <-
     new_deaths = deaths - lag(deaths, default = 0, order_by = date)
   ) %>%
   ungroup() %>%
-  mutate(country = if_else(country == 'US', 'United States of America', country))
+  mutate(country = if_else(country == 'US', 'United States of America', country)) %>%
+  filter(new_cases > -1000, new_deaths > -100)
 
-# geo_countries <- 
-#   rjson::fromJSON(file = paste0('https://raw.githubusercontent.com/datasets/',
-#                                 'geo-countries/master/data/countries.geojson'))
-# rjson::fromJSON(file = 'https://datahub.io/core/geo-countries/r/countries.geojson')
 geo_countries <- 
   rjson::fromJSON(file = paste0('https://raw.githubusercontent.com/AshKyd/',
                                 'geojson-regions/master/countries/110m/',
@@ -94,12 +92,6 @@ for (i in 1:length(geo_countries$features)) {
 today_global <-
   covid_global %>%
   filter(date == max(date, na.rm = T))
-
-today_global_m5 <-
-  covid_global %>%
-  filter(date == max(date, na.rm = T)) %>%
-  mutate(rnk = row_number(desc(new_cases))) %>%
-  filter(rnk > 5)
 
 today_states <- 
   covid_us %>%

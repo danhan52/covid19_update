@@ -27,7 +27,8 @@ load('data/covid_today.RData')
 load('data/geojson.RData')
 ```
 
-## Map of New Cases
+## Maps {.tabset .tabset-fade .tabset-pills}
+### New Cases
 ```{r world_map_cases}
 fig <-
   plot_ly(data = today_global) %>%
@@ -36,7 +37,8 @@ fig <-
     geojson=geo_countries,
     locations=~country,
     z=~new_cases,
-    colorscale="Viridis",
+    colorscale="YlOrRd",
+    reversescale=T,
     marker=list(line=list(
       width=0),
       opacity=0.5
@@ -50,7 +52,31 @@ fig <-
 fig
 ```
 
-## Table of New Cases
+### New Deaths
+```{r world_map_deaths}
+fig <-
+  plot_ly(data = today_global) %>%
+  add_trace(
+    type="choroplethmapbox",
+    geojson=geo_countries,
+    locations=~country,
+    z=~new_deaths,
+    colorscale="YlOrRd",
+    reversescale=T,
+    marker=list(line=list(
+      width=0),
+      opacity=0.5
+    )
+  ) %>%
+  layout(
+    mapbox=list(
+      style="carto-positron"
+    )
+  )
+fig
+```
+
+## Table of New Cases and Deaths
 ```{r world_table_cases}
  today_global %>%
   select(Country = country, Date = date, 'New Cases' = new_cases,

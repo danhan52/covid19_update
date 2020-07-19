@@ -27,7 +27,7 @@ load('data/covid_today.RData')
 load('data/geojson.RData')
 ```
 
-## Map of New Cases
+## Map of New Deaths
 ```{r county_map_cases}
 fig <-
   today_counties %>%
@@ -38,7 +38,7 @@ fig <-
     type="choroplethmapbox",
     geojson=geo_counties,
     locations=~fips,
-    z=~new_cases,
+    z=~new_deaths,
     colorscale="YlOrRd",
     reversescale=T,
     text=~cty_name,
@@ -55,21 +55,4 @@ fig <-
       center=list(lon= -95.71, lat=37.09))
   )
 fig
-```
-
-## Table of New Cases and Deaths
-```{r county_table_cases}
- today_counties %>%
-  select(State = state, County = county, Date = date, 'New Cases' = new_cases,
-         'New Deaths' = new_deaths) %>%
-  arrange(desc(`New Cases`)) %>%
-  datatable(options = list(pageLength = 20)) %>%
-  formatStyle(
-    'New Cases',
-    background = styleColorBar(today_counties$new_cases, 'steelblue')
-  ) %>%
-  formatStyle(
-    'New Deaths',
-    background = styleColorBar(today_counties$new_deaths, 'steelblue')
-  )
 ```

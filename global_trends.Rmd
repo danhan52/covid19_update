@@ -36,84 +36,106 @@ covid_global <-
   covid_global %>%
   left_join(c2c_map, by = 'country') %>%
   group_by(continent, country) %>%
-  mutate(mx_tot = max(cases)) %>%
+  mutate(
+    mx_tot_case = max(cases),
+    mx_tot_death = max(deaths)
+  ) %>%
   group_by(continent) %>%
-  mutate(rnk = dense_rank(desc(mx_tot))) %>%
+  mutate(
+    rnk_case = dense_rank(desc(mx_tot_case)),
+    rnk_death = dense_rank(desc(mx_tot_death))
+  ) %>%
   ungroup()
 ```
 
 
 ## Daily New Cases {.tabset .tabset-fade .tabset-pills}
 Only the top 5 countries (by total number of cases) are shown.
+```{r case_trend_fn}
+case_trend <- function(reg, mx_rnk) {
+  p <-
+    covid_global %>%
+    filter(continent %in% reg, rnk_case <= mx_rnk) %>%
+    ggplot(aes(x = date, y = new_cases, color = country)) +
+    geom_point() +
+    geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
+  
+  ggplotly(p)
+}
+```
 
 ### North America
 ```{r north_america_trend_case}
-p <-
-  covid_global %>%
-  filter(continent %in% 'North America', rnk <= 5) %>%
-  ggplot(aes(x = date, y = new_cases, color = country)) +
-  geom_point() +
-  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
-
-ggplotly(p)
+case_trend('North America', 5)
 ```
 
 ### South America
 ```{r south_america_trend_case}
-p <-
-  covid_global %>%
-  filter(continent %in% 'South America', rnk <= 5) %>%
-  ggplot(aes(x = date, y = new_cases, color = country)) +
-  geom_point() +
-  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
-
-ggplotly(p)
+case_trend('South America', 5)
 ```
 
 ### Europe
 ```{r europe_trend_case}
-p <-
-  covid_global %>%
-  filter(continent %in% 'Europe', rnk <= 5) %>%
-  ggplot(aes(x = date, y = new_cases, color = country)) +
-  geom_point() +
-  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
-
-ggplotly(p)
+case_trend('Europe', 5)
 ```
 
 ### Africa
 ```{r africa_trend_case}
-p <-
-  covid_global %>%
-  filter(continent %in% 'Africa', rnk <= 5) %>%
-  ggplot(aes(x = date, y = new_cases, color = country)) +
-  geom_point() +
-  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
-
-ggplotly(p)
+case_trend('Africa', 5)
 ```
 
 ### Asia
 ```{r asia_trend_case}
-p <-
-  covid_global %>%
-  filter(continent %in% 'Asia', rnk <= 5) %>%
-  ggplot(aes(x = date, y = new_cases, color = country)) +
-  geom_point() +
-  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
-
-ggplotly(p)
+case_trend('Asia', 5)
 ```
 
 ### Oceania
 ```{r oceania_trend_case}
-p <-
-  covid_global %>%
-  filter(continent %in% 'Oceania', rnk <= 5) %>%
-  ggplot(aes(x = date, y = new_cases, color = country)) +
-  geom_point() +
-  geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
+case_trend('Oceania', 5)
+```
 
-ggplotly(p)
+
+## Daily New Deaths {.tabset .tabset-fade .tabset-pills}
+Only the top 5 countries (by total number of deaths) are shown.
+```{r death_trend_fn}
+death_trend <- function(reg, mx_rnk) {
+  p <-
+    covid_global %>%
+    filter(continent %in% reg, rnk_death <= mx_rnk) %>%
+    ggplot(aes(x = date, y = new_deaths, color = country)) +
+    geom_point() +
+    geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
+  
+  ggplotly(p)
+}
+```
+
+### North America
+```{r north_america_trend_death}
+death_trend('North America', 5)
+```
+
+### South America
+```{r south_america_trend_death}
+death_trend('South America', 5)
+```
+
+### Europe
+```{r europe_trend_death}
+death_trend('Europe', 5)
+```
+
+### Africa
+```{r africa_trend_death}
+death_trend('Africa', 5)
+```
+
+### Asia
+```{r asia_trend_death}
+death_trend('Asia', 5)
+```
+
+### Oceania
+```{r oceania_trend_death}
+death_trend('Oceania', 5)
 ```

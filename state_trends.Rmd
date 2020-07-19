@@ -26,29 +26,139 @@ library(kableExtra)
 
 load('data/covid_ts.RData')
 load('data/covid_today.RData')
+
+stl <-
+  list(
+    'Northeast' = list(
+      'New England' = list('Connecticut', 'Maine', 'Massachusetts', 
+                           'New Hampshire', 'Rhode Island', 'Vermont'),
+      'Mid-Atlantic' = list('New Jersey', 'New York', 'Pennsylvania')
+    ),
+    'Midwest' = list(
+      'East North Central' = list('Illinois', 'Indiana', 'Michigan', 'Ohio',
+                                  'Wisconsin'),
+      'West North Central' = list('Iowa', 'Kansas', 'Minnesota', 'Missouri',
+                                  'Nebraska', 'North Dakota', 'South Dakota')
+    ),
+    'South' = list(
+      'South Atlantic' = c('Delaware', 'Florida', 'Georgia', 'Maryland',
+                           'North Carolina', 'South Carolina', 'Virginia',
+                           'District of Columbia', 'West Virginia'),
+      'East South Central' = list('Alabama', 'Kentucky', 'Mississippi',
+                                  'Tennessee'),
+      'West South Central' = list('Arkansas', 'Louisiana', 'Oklahoma', 'Texas')
+    ),
+    'West' = list(
+      'Mountain' = list('Arizona', 'Colorado', 'Idaho', 'Montana', 'Nevada',
+                        'New Mexico', 'Utah', 'Wyoming'),
+      'Pacific' = list('Alaska', 'California', 'Hawaii', 'Oregon', 'Washington')
+    )
+  )
+
+sdf <- tibble(region = character(), division = character(), state = character())
+for (reg in names(stl)) {
+  for (div in names(stl[[reg]])) {
+    for (st in stl[[reg]][[div]]) {
+      sdf <- bind_rows(
+        sdf,
+        tibble(region = reg, division = div, state = st)
+      )
+    }
+  }
+}
+
+covid_state <-
+  covid_us %>%
+  left_join(sdf, by = 'state') %>%
+  group_by(date, state, region, division, state.abb) %>%
+  summarize(
+    cases = sum(cases, na.rm = T),
+    deaths = sum(deaths, na.rm = T),
+    new_cases = sum(new_cases, na.rm = T),
+    new_deaths = sum(new_deaths, na.rm = T),
+    popestimate2019 = sum(popestimate2019, na.rm = T)
+  ) %>%
+  group_by(state, region) %>%
+  mutate(
+    mx_tot_case = max(cases),
+    mx_tot_death = max(deaths)
+  ) %>%
+  group_by(region) %>%
+  mutate(
+    rnk_case = dense_rank(desc(mx_tot_case)),
+    rnk_death = dense_rank(desc(mx_tot_death))
+  ) %>%
+  ungroup()
 ```
 
 
-## Bar Charts {.tabset .tabset-fade .tabset-pills}
-### All Countries
-```{r world_bar, fig.width=6, fig.height=10}
-p <-
-  today_global %>%
-  mutate(rnk = row_number(desc(new_cases))) %>%
-  filter(rnk < 30) %>%
-  ggplot(aes(x = reorder(country, new_cases), y = new_cases)) +
-  geom_bar(stat = 'identity') +
-  coord_flip()
-ggplotly(p)
+## Daily New Cases {.tabset .tabset-fade .tabset-pills}
+Only the top 5 states (by total number of cases) are shown.
+```{r case_trend_fn}
+case_trend <- function(reg, mx_rnk) {
+  p <-
+    covid_state %>%
+    filter(region %in% reg, rnk_case <= mx_rnk) %>%
+    ggplot(aes(x = date, y = new_cases, color = state)) +
+    geom_point() +
+    geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
+  
+  ggplotly(p)
+}
 ```
 
-### US States
-```{r state_bar}
-
+### West
+```{r west_trend_case}
+case_trend('West', 5)
 ```
 
-### US Counties
-```{r county_bar}
-
+### Midwest
+```{r midwest_trend_case}
+case_trend('Midwest', 5)
 ```
 
+### South
+```{r south_trend_case}
+case_trend('South', 5)
+```
+
+### Northeast
+```{r northeast_trend_case}
+case_trend('Northeast', 5)
+```
+
+
+## Daily New Deaths {.tabset .tabset-fade .tabset-pills}
+Only the top 5 states (by total number of deaths) are shown.
+```{r death_trend_fn}
+death_trend <- function(reg, mx_rnk) {
+  p <-
+    covid_state %>%
+    filter(region %in% reg, rnk_death <= mx_rnk) %>%
+    ggplot(aes(x = date, y = new_deaths, color = state)) +
+    geom_point() +
+    geom_smooth(method = 'loess', formula = y ~ x, se = FALSE)
+  
+  ggplotly(p)
+}
+```
+
+### West
+```{r west_trend_death}
+death_trend('West', 5)
+```
+
+### Midwest
+```{r midwest_trend_death}
+death_trend('Midwest', 5)
+```
+
+### South
+```{r south_trend_death}
+death_trend('South', 5)
+```
+
+### Northeast
+```{r northeast_trend_death}
+death_trend('Northeast', 5)
+```

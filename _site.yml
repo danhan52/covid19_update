@@ -9,11 +9,11 @@ navbar:
       href: global_update.html
     - text: "US State Update"
       href: state_update.html
-    - text: "US County Update"
+    - text: "US County Case Update"
       href: county_update.html
+    - text: "US County Death Update"
+      href: county_update_death.html
     - text: "Global Trend"
       href: global_trends.html
     - text: "US State Trend"
-      href: state_trends.html
-    - text: "US County Trend"
       href: state_trends.html
