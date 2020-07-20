@@ -18,6 +18,8 @@ jobs:
         run: Rscript render_site.R
       - name: Commit results
         run: |
+          git config --global user.name 'danhan52'
+          git config --global user.email 'danny.hanson52@gmail.com'
           git add docs/*
           git commit -m 'Update site with new data' || echo "No changes to commit"
           git push origin master || echo "No changes to commit"
